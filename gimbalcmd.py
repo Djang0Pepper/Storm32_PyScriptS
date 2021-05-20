@@ -13,8 +13,9 @@ import time
 import serial
 import binascii
 from serial import SerialException
-import serial.tools.list_ports
 
+import serial.tools.list_ports
+import argparse
 '''
 WIP to do list
 *Set COM outside script, easy
@@ -56,21 +57,23 @@ sleep = [False]
 #######################################################################################
 
 #Find Serial port
-
-################ from tracker added ####################################################
-#def serialfind():
-#print('Search...')
 ports = serial.tools.list_ports.comports(include_links=False)
 for port in ports :
 	print('\nFind port '+ port.device)
 mycom = serial.Serial(port.device)
 if mycom.isOpen():
 	mycom.close()
-#useless see serilainit mycom = serial.Serial(port.device, baud, timeout=1,)
-#print('Connectable ' + mycom.name)
 time.sleep(1.0)
 com = mycom.name
-#return(mycom.name)
+
+
+# construct the argument parser and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-b", "--bauds",    type=str,  default=115200, help="baud rate")
+ap.add_argument("-o", "--homeall",  type=str,  default="0",    help="center gimbal axis")
+ap.add_argument("-c", "--commands", type=str,  default="0",    help="center gimbal axis")
+
+args = vars(ap.parse_args())
 
 
 #Initializes Serial
@@ -78,7 +81,6 @@ def serialinit():
 	global ser
 	try:
 		ser = (serial.Serial(
-		#port = serialfind(),
 		port = com,
 		baudrate = baud,
 		parity = serial.PARITY_NONE,
@@ -142,27 +144,27 @@ def setpitchrollyaw(pitchin, rollin, yawin):
 
 #Checks serial response
 def responsetest(ser):
-   ser.open()
-   ser.write(b't')
-   response = ser.readline()
-   #print(response)
-   if response == b'o':
-      #print("Test response good!")
-      safemode = False
-   else:
-      print("""
-RESPONSE ERROR: Gimbal response INOP/bad, aspects of the script will
-be put into safe mode.  This will cause overall control inaccuracies.
- Fixes:
-   1.) Restart Gimbal.
-   2.) Disconnect any extra/unnecessary serial connections.
-   3.) Re-connect and check gimbal Serial/COM connections.""")
-      userstop = input("Would you like to continue anyways [Y/N]? ")
-      if (userstop != 'y') and (userstop != 'Y'):
-           sys.exit("Script cancelled.")
-      else: safemode = True
-   ser.close()
-   return(safemode)
+	ser.open()
+	ser.write(b't')
+	response = ser.readline()
+	#print(response)
+	if response == b'o':
+		#print("Test response good!")
+		safemode = False
+	else:
+		print("""
+		RESPONSE ERROR: Gimbal response INOP/bad, aspects of the script will
+		be put into safe mode.  This will cause overall control inaccuracies.
+		Fixes:
+			1.) Restart Gimbal.
+			2.) Disconnect any extra/unnecessary serial connections.
+			3.) Re-connect and check gimbal Serial/COM connections.""")
+		userstop = input("Would you like to continue anyways [Y/N]? ")
+		if (userstop != 'y') and (userstop != 'Y'):
+			sys.exit("Script cancelled.")
+		else: safemode = True
+	ser.close()
+	return(safemode)
 
 #Stores parameter data in pairs of two (ex:(min, max))
 def paramstore(flag):
@@ -209,24 +211,24 @@ def sleepmultipliercalc():
 
 #Data display for important info
 def datalog(safemode):
-    print('''\
-*******************************
-	Storm32 GIMBAL CONTROLLER
-===============================
-        Min    Max
-Pitch:[{pmin}, {pmax}]
-Roll :[{rmin}, {rmax}]
-Yaw  :[{ymin}, {ymax}]
-*******************************
-SafeMode Active: [{sm}]
-*******************************
-Port: {port}  Baud: [{br}]
-*******************************
-DataLog:\
-'''.format(pmin = axislimit[0], pmax = axislimit[1],rmin = axislimit[2],
-rmax = axislimit[3], ymin = axislimit[4], ymax = axislimit[5],
-sm = safemode, port = com, br = baud))
-    return(None)
+		print('''\
+	*******************************
+		Storm32 GIMBAL CONTROLLER
+	===============================
+			Min    Max
+	Pitch:[{pmin}, {pmax}]
+	Roll :[{rmin}, {rmax}]
+	Yaw  :[{ymin}, {ymax}]
+	*******************************
+	SafeMode Active: [{sm}]
+	*******************************
+	Port: {port}  Baud: [{br}]
+	*******************************
+	DataLog:\
+	'''.format(pmin = axislimit[0], pmax = axislimit[1],rmin = axislimit[2],
+	rmax = axislimit[3], ymin = axislimit[4], ymax = axislimit[5],
+	sm = safemode, port = com, br = baud))
+		return(None)
 
 ###########################Frequently used equations/code##################################
 #Decimal to 4byte HEX
@@ -351,8 +353,6 @@ def cmdexecute(cmd,sleep):
 
 #Intializes script
 def main():
-	#print('Searching port...', end='')
-	#com = serialfind()
 	print('Initializing...', end='')
 	sys.stdout.flush()
 	ser = serialinit()
@@ -367,8 +367,13 @@ def main():
 
 if __name__=="__main__":
 	main()
-else:
+else :
 	main()
+
+if args.get("homeall"):
+	homeall()
+
+
 
 #Test script here
 #setpitch(10)
