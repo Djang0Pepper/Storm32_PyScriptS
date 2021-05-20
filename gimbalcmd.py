@@ -62,7 +62,7 @@ def serialfind():
 	#print('Search...')
 	ports = serial.tools.list_ports.comports(include_links=False)
 	for port in ports :
-		print('Find port '+ port.device)
+		print('\nFind port '+ port.device)
 	mycom = serial.Serial(port.device)
 	if mycom.isOpen():
 		mycom.close()
@@ -93,48 +93,48 @@ def serialinit():
 ##################COMMAND LIST BELOW##################
 ######################################################
 def getversionstr():
-     cmd = bytes.fromhex('FA0002'+crc)
-     cmdexecute(cmd, sleep)
+	cmd = bytes.fromhex('FA0002'+crc)
+	cmdexecute(cmd, sleep)
 
 def getparameter(number):
-     hexnum = dectohex(number)
-     cmd = bytes.fromhex('FA0203'+hexnum+crc)
-     response = cmdexecute(cmd, sleep)
-     return(response)
+	hexnum = dectohex(number)
+	cmd = bytes.fromhex('FA0203'+hexnum+crc)
+	response = cmdexecute(cmd, sleep)
+	return(response)
 
 def homeall():
-     setpitchrollyaw(0, 0, 0)
+	setpitchrollyaw(0, 0, 0)
 
 def homepitch():
-     setpitch(0)
+	setpitch(0)
 
 def homeroll():
-     setpitch(0)
+	setpitch(0)
 
 def homeyaw():
-     setyaw(0)
+	setyaw(0)
 
 def setpitch(pitchin):
-     pitch = pitchconvert(pitchin)
-     cmd = bytes.fromhex('FA020A'+pitch+crc)
-     cmdexecute(cmd,sleep)
+	pitch = pitchconvert(pitchin)
+	cmd = bytes.fromhex('FA020A'+pitch+crc)
+	cmdexecute(cmd,sleep)
 
 def setroll(rollin):
-     roll = rollconvert(rollin)
-     cmd = bytes.fromhex('FA020B'+roll+crc)
-     cmdexecute(cmd,sleep)
+	roll = rollconvert(rollin)
+	cmd = bytes.fromhex('FA020B'+roll+crc)
+	cmdexecute(cmd,sleep)
 
 def setyaw(yawin):
-     yaw = yawconvert(yawin)
-     cmd = bytes.fromhex('FA020C'+yaw+crc)
-     cmdexecute(cmd,sleep)
+	yaw = yawconvert(yawin)
+	cmd = bytes.fromhex('FA020C'+yaw+crc)
+	cmdexecute(cmd,sleep)
 
 def setpitchrollyaw(pitchin, rollin, yawin):
-     pitch = pitchconvert(pitchin)
-     roll = rollconvert(rollin)
-     yaw = yawconvert(yawin)
-     cmd = bytes.fromhex('FA0612'+pitch+roll+yaw+crc)
-     cmdexecute(cmd,sleep)
+	pitch = pitchconvert(pitchin)
+	roll = rollconvert(rollin)
+	yaw = yawconvert(yawin)
+	cmd = bytes.fromhex('FA0612'+pitch+roll+yaw+crc)
+	cmdexecute(cmd,sleep)
 ######################################################
 ######################################################
 
@@ -164,23 +164,23 @@ be put into safe mode.  This will cause overall control inaccuracies.
 
 #Stores parameter data in pairs of two (ex:(min, max))
 def paramstore(flag):
-     param = [None]*2
-     for i in range(2):
+    param = [None]*2
+    for i in range(2):
         index = 0
         if flag == False:
-          for j in range(0,5,2):
-             param[0] = getparameter(paramloc[i][j])
-             param[1] = getparameter(paramloc[i][j+1])
-             for k in param:
-                paramsnip = sniphex(k,10,14) #Snips out the param value
-                paramflip = fliphex(paramsnip) #Flips hex to High-Low
-                signeddec = int(paramflip, 16) #Converts to decimal
-                paramlist[i][index] = (-(signeddec & 0x8000) | (signeddec & 0x7fff))/10 #Converts signed decimal to negatives and shifts decimal point
-                index += 1
+            for j in range(0,5,2):
+                param[0] = getparameter(paramloc[i][j])
+                param[1] = getparameter(paramloc[i][j+1])
+                for k in param:
+                    paramsnip = sniphex(k,10,14) #Snips out the param value
+                    paramflip = fliphex(paramsnip) #Flips hex to High-Low
+                    signeddec = int(paramflip, 16) #Converts to decimal
+                    paramlist[i][index] = (-(signeddec & 0x8000) | (signeddec & 0x7fff))/10 #Converts signed decimal to negatives and shifts decimal point
+                    index += 1
         else:
-          for k in range(6):
-             paramlist[i][k] = safemodelist[i][k]
-     return(None)
+            for k in range(6):
+                paramlist[i][k] = safemodelist[i][k]
+    return(None)
 
 #Calculates the deg -> decimal interval for each axis
 def intervalcalc():
@@ -209,7 +209,7 @@ def sleepmultipliercalc():
 def datalog(safemode):
     print('''\
 *******************************
-   Storm32 GIMBAL CONTROLLER
+	Storm32 GIMBAL CONTROLLER
 ===============================
         Min    Max
 Pitch:[{pmin}, {pmax}]
@@ -251,80 +251,80 @@ def sniphex(snipbytes, start, stop):
 
 #Checks input to see if it's in-bounds
 def pitchincheck(pitchin):
-     if pitchin < axislimit[0]:
-          pitchin = axislimit[0]
-          print ('Pitch exceeds min travel parameter! Input was adjusted to max travel distance.')
-     elif pitchin > axislimit[1]:
-          pitchin = axislimit[1]
-          print ('Pitch exceeds max travel parameter! Input was adjusted to max travel distance.')
-     return(pitchin)
+	if pitchin < axislimit[0]:
+		pitchin = axislimit[0]
+		print ('Pitch exceeds min travel parameter! Input was adjusted to max travel distance.')
+	elif pitchin > axislimit[1]:
+		pitchin = axislimit[1]
+		print ('Pitch exceeds max travel parameter! Input was adjusted to max travel distance.')
+	return(pitchin)
 
 def rollincheck(rollin):
-     if rollin < axislimit[2]:
-          rollin = axislimit[2]
-          print ('Roll exceeds min travel parameter! Input was adjusted to max travel distance.')
-     elif rollin > axislimit[3]:
-          rollin = axislimit[3]
-          print ('Roll exceeds max travel parameter! Input was adjusted to max travel distance.')
-     return(rollin)
+	if rollin < axislimit[2]:
+		rollin = axislimit[2]
+		print ('Roll exceeds min travel parameter! Input was adjusted to max travel distance.')
+	elif rollin > axislimit[3]:
+		rollin = axislimit[3]
+		print ('Roll exceeds max travel parameter! Input was adjusted to max travel distance.')
+	return(rollin)
 
 def yawincheck(yawin):
-     if yawin < axislimit[4]:
-          yawin = axislimit[4]
-          print ('Yaw exceeds min travel parameter! Input was adjusted to max travel distance.')
-     elif yawin > axislimit[5]:
-          yawin = axislimit[5]
-          print ('Yaw exceeds max travel parameter! Input was adjusted to max travel distance.')
-     return(yawin)
+	if yawin < axislimit[4]:
+		yawin = axislimit[4]
+		print ('Yaw exceeds min travel parameter! Input was adjusted to max travel distance.')
+	elif yawin > axislimit[5]:
+		yawin = axislimit[5]
+		print ('Yaw exceeds max travel parameter! Input was adjusted to max travel distance.')
+	return(yawin)
 #######################################################################################################
 #######################################################################################################
 
 '''Combine into 1 function'''
 #Converts input to useable HEX data for gimbal (Only for certain commands!)
 def pitchconvert(pitchin):
-     pitchin = pitchincheck(pitchin)
-     sleepinput = abs(pitchin - axispos[0])
-     if pitchin <= zeropoint[0]:
-          pitchraw = int(1500 + (dofinterval[0]*pitchin)) #Converts user roll input to movement distance
-     else:
-          pitchraw = int(1500 + (dofinterval[1]*pitchin))
-     pitch = dectohex(pitchraw) #Re-orders bytes to Low-High in pairs of two
-     #print(pitch)
-     sleeptime[0] = ((sleepmultiplier[0] * sleepinput)+sleepmultiplier[1])
-     axispos[0] = pitchin
-     sleep[0] = True
-     print('Pitch axis:', pitchin, end='°\n')
-     return(pitch)
+	pitchin = pitchincheck(pitchin)
+	sleepinput = abs(pitchin - axispos[0])
+	if pitchin <= zeropoint[0]:
+		pitchraw = int(1500 + (dofinterval[0]*pitchin)) #Converts user roll input to movement distance
+	else:
+		pitchraw = int(1500 + (dofinterval[1]*pitchin))
+	pitch = dectohex(pitchraw) #Re-orders bytes to Low-High in pairs of two
+	#print(pitch)
+	sleeptime[0] = ((sleepmultiplier[0] * sleepinput)+sleepmultiplier[1])
+	axispos[0] = pitchin
+	sleep[0] = True
+	print('Pitch axis:', pitchin, end='°\n')
+	return(pitch)
 
 def rollconvert(rollin):
-     rollin = rollincheck(rollin)
-     sleepinput = abs(rollin - axispos[1])
-     if rollin <= zeropoint[1]:
-          rollraw = int(1500 + (dofinterval[2]*rollin)) #Converts user roll input to movement distance
-     else:
-          rollraw = int(1500 + (dofinterval[3]*rollin))
-     roll = dectohex(rollraw) #Re-orders bytes to Low-High in pairs of two
-     #print(roll)
-     sleeptime[0] = abs((sleepmultiplier[2] * sleepinput)+sleepmultiplier[3])
-     axispos[1] = rollin
-     sleep[0] = True
-     print('Roll axis:', rollin, end='°\n')
-     return(roll)
+	rollin = rollincheck(rollin)
+	sleepinput = abs(rollin - axispos[1])
+	if rollin <= zeropoint[1]:
+		rollraw = int(1500 + (dofinterval[2]*rollin)) #Converts user roll input to movement distance
+	else:
+		rollraw = int(1500 + (dofinterval[3]*rollin))
+	roll = dectohex(rollraw) #Re-orders bytes to Low-High in pairs of two
+	#print(roll)
+	sleeptime[0] = abs((sleepmultiplier[2] * sleepinput)+sleepmultiplier[3])
+	axispos[1] = rollin
+	sleep[0] = True
+	print('Roll axis:', rollin, end='°\n')
+	return(roll)
 
 def yawconvert(yawin):
-     yawin = yawincheck(yawin)
-     sleepinput = abs(yawin - axispos[2])
-     if yawin <= zeropoint[2]:
-          yawraw = int(1500 + (dofinterval[4]*yawin)) #Converts user roll input to movement distance
-     else:
-          yawraw = int(1500 + (dofinterval[5]*yawin))
-     yaw = dectohex(yawraw) #Re-orders bytes to Low-High in pairs of two
-     #print(yaw)
-     sleeptime[0] = abs((sleepmultiplier[4] * sleepinput)+sleepmultiplier[5])
-     axispos[2] = yawin
-     sleep[0] = True
-     print('Yaw axis:', yawin, end='°\n')
-     return(yaw)
+	yawin = yawincheck(yawin)
+	sleepinput = abs(yawin - axispos[2])
+	if yawin <= zeropoint[2]:
+		yawraw = int(1500 + (dofinterval[4]*yawin)) #Converts user roll input to movement distance
+	else:
+		yawraw = int(1500 + (dofinterval[5]*yawin))
+	yaw = dectohex(yawraw) #Re-orders bytes to Low-High in pairs of two
+	#print(yaw)
+	sleeptime[0] = abs((sleepmultiplier[4] * sleepinput)+sleepmultiplier[5])
+	axispos[2] = yawin
+	sleep[0] = True
+	print('Yaw axis:', yawin, end='°\n')
+	return(yaw)
 ###########################################################################################################################
 ###########################################################################################################################
 
