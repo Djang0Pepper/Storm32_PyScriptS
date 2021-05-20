@@ -1,4 +1,4 @@
-#Simple Gimbal Command Control
+#Gimbal Command Control
 #By: Brandon
 #v1.0 Date:07/19/2018
 
@@ -24,7 +24,7 @@ WIP to do list
 
 ######################Global variable declaration(User Specific)#######################
 baud = 115200 #Having the wrong value here will cause serial communication issues.
-com = 'COM3' #Change this value to your COM port
+com = 'COM99' #Change this value to your COM port
 crc = '3334'  #Non-mavlink CRC dummy value. Should not need to change!
 sleeptime = [None, .25] #In seconds. [Movement CMD delay, Non-movement CMD delay]
 ser = 0
@@ -58,18 +58,19 @@ sleep = [False]
 #Find Serial port
 
 ################ from tracker added ####################################################
-def serialfind():
-	#print('Search...')
-	ports = serial.tools.list_ports.comports(include_links=False)
-	for port in ports :
-		print('\nFind port '+ port.device)
-	mycom = serial.Serial(port.device)
-	if mycom.isOpen():
-		mycom.close()
-	#useless see serilainit mycom = serial.Serial(port.device, baud, timeout=1,)
-	print('Connect ' + mycom.name)
-	time.sleep(1.0)
-	com = mycom.name
+#def serialfind():
+#print('Search...')
+ports = serial.tools.list_ports.comports(include_links=False)
+for port in ports :
+	print('\nFind port '+ port.device)
+mycom = serial.Serial(port.device)
+if mycom.isOpen():
+	mycom.close()
+#useless see serilainit mycom = serial.Serial(port.device, baud, timeout=1,)
+#print('Connectable ' + mycom.name)
+time.sleep(1.0)
+com = mycom.name
+#return(mycom.name)
 
 
 #Initializes Serial
@@ -77,6 +78,7 @@ def serialinit():
 	global ser
 	try:
 		ser = (serial.Serial(
+		#port = serialfind(),
 		port = com,
 		baudrate = baud,
 		parity = serial.PARITY_NONE,
@@ -349,8 +351,8 @@ def cmdexecute(cmd,sleep):
 
 #Intializes script
 def main():
-	print('finding port...', end='')
-	serialfind()
+	#print('Searching port...', end='')
+	#com = serialfind()
 	print('Initializing...', end='')
 	sys.stdout.flush()
 	ser = serialinit()
