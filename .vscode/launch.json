@@ -4,12 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python : Fichier actuel",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args" : ["-args1", "valueorfileargs1"],
+            "args" : ["-o", "null"],
             "console": "integratedTerminal"
         }
     ]

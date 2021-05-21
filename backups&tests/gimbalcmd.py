@@ -71,7 +71,6 @@ com = mycom.name
 ap = argparse.ArgumentParser()
 ap.add_argument("-b", "--bauds",   type=str, default=115200, help="baud rate")
 ap.add_argument("-o", "--homeall", type=str,  default="0", help="center gimbal axis")
-ap.add_argument("-v", "--version", type=str,  default="0", help="show version")
 
 args = vars(ap.parse_args())
 
@@ -212,18 +211,18 @@ def sleepmultipliercalc():
 #Data display for important info
 def datalog(safemode):
 		print('''\
-	*********************************
+	*******************************
 		Storm32 GIMBAL CONTROLLER
-	=================================
+	===============================
 			Min    Max
 	Pitch:[{pmin}, {pmax}]
 	Roll :[{rmin}, {rmax}]
 	Yaw  :[{ymin}, {ymax}]
-	*********************************
-		SafeMode Active: [{sm}]
-	*********************************
-		Port: {port}  Baud: [{br}]
-	*********************************
+	*******************************
+	SafeMode Active: [{sm}]
+	*******************************
+	Port: {port}  Baud: [{br}]
+	*******************************
 	DataLog:\
 	'''.format(pmin = axislimit[0], pmax = axislimit[1],rmin = axislimit[2],
 	rmax = axislimit[3], ymin = axislimit[4], ymax = axislimit[5],
@@ -351,11 +350,6 @@ def cmdexecute(cmd,sleep):
 	ser.close()
 	return(response)
 
-def myfunction(mystring):
-    print(mystring)
-
-
-
 #Intializes script
 def main():
 	print('Initializing...', end='')
@@ -368,16 +362,16 @@ def main():
 	print("Done")
 	datalog(safemode)
 	array = ['helloworld']
-	if args.get("homeall"):
-		homeall()
-	if args.get("version"):
-		getversionstr
 
-"""
+
 if __name__=="__main__":
 	main()
 else :
 	main()
+
+if args.get("homeall"):
+	homeall()
+
 
 
 #Test script here
@@ -385,10 +379,3 @@ else :
 #setroll(10)
 #setyaw(50)
 #homeall()
-#notworking whitout battery?  getversionstr()
-"""
-
-if __name__ == '__main__':
-    globals()[sys.argv[1]](sys.argv[2])
-else :
-	main()
